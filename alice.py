@@ -13,6 +13,9 @@ import qkd
 # Key
 siftedKey = []
 
+# key length
+keyLength = 40
+
 # Channel
 QUANTUM_CHANNEL = []
 CLASSICAL_CHANNEL = []
@@ -44,7 +47,7 @@ while(True):
             client_socket.send('Yes'.encode('utf-8'))
             judge = measure_qubit_using_basis(qubit, alice_basis)
             siftedKey.append(int(qubit.bit))
-            if len(siftedKey) == 2048:
+            if len(siftedKey) == keyLength:
                 break
         else:
             client_socket.send('No'.encode('utf-8'))

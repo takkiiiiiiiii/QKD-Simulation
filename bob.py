@@ -13,6 +13,9 @@ from distutils.util import strtobool
 # Key
 siftedKey = []
 
+# key length
+keyLength = 40
+
 # サーバーのIPアドレスとポート
 SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 12001
@@ -52,7 +55,7 @@ while(True):
         if resp == 'Yes':
             if judge == strtobool('True'):
                 siftedKey.append(int(qubit.bit))
-                if len(siftedKey) == 2048:
+                if len(siftedKey) == keyLength:
                     break
             else:
                 # discard
