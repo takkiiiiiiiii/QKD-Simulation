@@ -14,7 +14,7 @@ from distutils.util import strtobool
 siftedKey = []
 
 # key length
-keyLength = 40
+keyLength = 2048
 
 # サーバーのIPアドレスとポート
 SERVER_HOST = '127.0.0.1'

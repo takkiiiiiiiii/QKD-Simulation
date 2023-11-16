@@ -1,5 +1,3 @@
-from os import stat
-from sre_parse import State
 from interface import QuantumDevice, Qubit
 from simulator import SingleQubitSimulator
 from typing import List
