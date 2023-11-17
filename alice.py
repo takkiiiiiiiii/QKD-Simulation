@@ -7,6 +7,7 @@ from interface import Qubit
 from interface import QuantumDevice
 from simulator import SingleQubitSimulator, KET_0
 from distutils.util import strtobool
+import time
 
 import qkd
 
@@ -31,7 +32,48 @@ client_socket.connect((SERVER_HOST, SERVER_PORT))
 alice_device = SingleQubitSimulator()
 
 
+# for refresh the key (one-time-pad)
+def updateKey():
+    while(True):
+        try:
+            alice_bit, alice_basis, qubit = generate_alice_basis_and_bit_and_qubit(alice_device)
+            qubit.basis = alice_basis
+            qubit.bit = alice_bit
+    
+            serialized_qubit = pickle.dumps(qubit)
+            client_socket.send(serialized_qubit)
+    
+            bob_basis = client_socket.recv(1024).decode('utf-8')
+
+            if alice_basis == strtobool(bob_basis):
+                client_socket.send('Yes'.encode('utf-8'))
+                judge = measure_qubit_using_basis(qubit, alice_basis)
+                siftedKey.append(int(qubit.bit))
+                if len(siftedKey) == keyLength:
+                    break
+            else:
+                client_socket.send('No'.encode('utf-8'))
+    
+        except ConnectionResetError:
+            print("Server was closed")
+            break
+
+def scheduler_for_updateKey(interval, f, wait=True):
+    base_time = time.time()
+    next_time = 0
+    while True:
+        t = threading.Thread(target=f)
+        t.start()
+        if wait:
+            t.join()
+        next_time = ((base_time - time.time()) % interval) or interval
+        time.sleep(next_time)
+
+# for updating the key per 180 seconds (3 mintues)
+scheduler_for_updateKey(180, updateKey, False)
+
 # サーバーからのデータを受信する関数
+
 while(True):
     try:
         alice_bit, alice_basis, qubit = generate_alice_basis_and_bit_and_qubit(alice_device)
@@ -81,7 +123,7 @@ def receive():
             break
 
 
-# 新しいスレッドでメッセージを受信する
+# for receiving the message
 threading.Thread(target=receive).start()
 
 while(True):
@@ -93,5 +135,3 @@ while(True):
     
     encoded_massage = ''.join(map(str, bit_array))
     client_socket.send(encoded_massage.encode('utf-8'))
-
-
