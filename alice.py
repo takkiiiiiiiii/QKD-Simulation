@@ -15,7 +15,7 @@ import qkd
 siftedKey = []
 
 # key length
-keyLength = 40
+keyLength = 2048
 
 # Channel
 QUANTUM_CHANNEL = []
@@ -24,6 +24,8 @@ CLASSICAL_CHANNEL = []
 # サーバーのIPアドレスとポート
 SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 12001
+
+time = 0
 
 # クライアントソケットを作成
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,6 +78,7 @@ scheduler_for_updateKey(180, updateKey, False)
 
 while(True):
     try:
+        time += 1
         alice_bit, alice_basis, qubit = generate_alice_basis_and_bit_and_qubit(alice_device)
         qubit.basis = alice_basis
         qubit.bit = alice_bit
@@ -99,6 +102,7 @@ while(True):
         break
 
 print(siftedKey)
+print(f'repeted {time} times')
 
 def bool_to_bytes(bool_value) -> bool:
     if bool_value:
